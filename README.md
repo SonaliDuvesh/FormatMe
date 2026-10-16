@@ -130,19 +130,5 @@ python app.py
 ```
 Open `http://127.0.0.1:5000` in your web browser.
 
----
 
-## Deployment to GitHub Pages
 
-This repository includes an automated GitHub Actions deployment workflow located at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
-
-Every commit pushed to the `main` branch automatically:
-1. Validates the static web assets (`index.html`, `static/`, and `view.jpeg`).
-2. Packages the static site bundle into `_site`.
-3. Deploys the application directly to GitHub Pages at **[https://sonaliduvesh.github.io/FormatMe/](https://sonaliduvesh.github.io/FormatMe/)**.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE) — see the LICENSE file for details.
