@@ -97,7 +97,7 @@ brew install ffmpeg libreoffice p7zip
 ### 1. Clone & Prepare Environment
 ```bash
 # Clone repository
-git clone https://github.com/your-username/FormatMe.git
+git clone https://github.com/SonaliDuvesh/FormatMe.git
 cd FormatMe
 
 # Create dedicated virtual environment
