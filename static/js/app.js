@@ -142,19 +142,8 @@ async function detectItemFormat(index) {
   const item = fileQueue[index];
   if (!item) return;
 
-  const formData = new FormData();
-  formData.append("file", item.file);
-
   try {
-    const response = await fetch("/api/detect", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await parseJsonResponse(response);
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to analyze file");
-    }
+    const data = await window.FormatMeEngine.detectFile(item.file);
 
     item.temp_file_id = data.temp_file_id;
     item.detection = data.detection;
@@ -674,20 +663,13 @@ async function executeCombineImagesToPdf() {
   const images = fileQueue.filter(i => i.detection && i.detection.category === "image");
   if (images.length < 2) return;
 
-  const formData = new FormData();
-  images.forEach(img => formData.append("file_ids", img.temp_file_id));
-  formData.append("title", "combined_images.pdf");
-
   showProgress("Stitching images into PDF document...", 20);
 
   try {
-    const res = await fetch("/api/combine-images-to-pdf", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to combine images");
+    const data = await window.FormatMeEngine.combineMultipleImagesToPdf(
+      images.map(img => img.file),
+      "combined_images.pdf"
+    );
 
     showProgress("Finalized PDF!", 100);
     setTimeout(() => hideProgress(), 600);
@@ -712,20 +694,13 @@ async function executeMergePdfs() {
   const pdfs = fileQueue.filter(i => i.detection && i.detection.format === "pdf");
   if (pdfs.length < 2) return;
 
-  const formData = new FormData();
-  pdfs.forEach(p => formData.append("file_ids", p.temp_file_id));
-  formData.append("output_name", "merged_document.pdf");
-
   showProgress("Merging PDF documents...", 30);
 
   try {
-    const res = await fetch("/api/merge-pdfs", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to merge PDFs");
+    const data = await window.FormatMeEngine.mergeMultiplePdfs(
+      pdfs.map(p => p.file),
+      "merged_document.pdf"
+    );
 
     showProgress("Merged successfully!", 100);
     setTimeout(() => hideProgress(), 600);
@@ -756,33 +731,8 @@ async function convertSingleQueueItem(e, index) {
 
   showProgress(`Converting ${item.filename} to ${item.selected_target.toUpperCase()}...`, 30);
 
-  const formData = new FormData();
-  formData.append("temp_file_id", item.temp_file_id);
-  formData.append("target_format", item.selected_target);
-  formData.append("options", JSON.stringify(item.options));
-
   try {
-    const response = await fetch("/api/convert", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await parseJsonResponse(response);
-
-    if (response.status === 403 && data.code === "PASSWORD_REQUIRED") {
-      hideProgress();
-      item.status = "ready";
-      renderQueue();
-      promptPassword((pw) => {
-        item.options.password = pw;
-        convertSingleQueueItem(null, index);
-      });
-      return;
-    }
-
-    if (!response.ok) {
-      throw new Error(data.error || "Conversion failed");
-    }
+    const data = await window.FormatMeEngine.convertSingleFile(item.file, item.selected_target, item.options);
 
     showProgress("Done!", 100);
     setTimeout(() => hideProgress(), 500);
@@ -790,6 +740,7 @@ async function convertSingleQueueItem(e, index) {
     item.status = "done";
     item.output_download_url = data.download_url;
     item.output_filename = data.output_filename;
+    item.blob = data.blob;
     renderQueue();
 
     addResultItem({
@@ -804,6 +755,15 @@ async function convertSingleQueueItem(e, index) {
     showNotification("Conversion Complete", `Successfully converted ${item.filename}`, "success");
   } catch (err) {
     hideProgress();
+    if (err && err.code === "PASSWORD_REQUIRED") {
+      item.status = "ready";
+      renderQueue();
+      promptPassword((pw) => {
+        item.options.password = pw;
+        convertSingleQueueItem(null, index);
+      });
+      return;
+    }
     item.status = "error";
     item.error = err.message;
     renderQueue();
@@ -829,7 +789,7 @@ async function startConvertAllQueue() {
 
   let convertedCount = 0;
   const totalCount = convertibleItems.length;
-  const outputUrls = [];
+  const outputItems = [];
 
   for (let i = 0; i < fileQueue.length; i++) {
     const item = fileQueue[i];
@@ -841,34 +801,19 @@ async function startConvertAllQueue() {
     item.status = "converting";
     renderQueue();
 
-    const formData = new FormData();
-    formData.append("temp_file_id", item.temp_file_id);
-    formData.append("target_format", item.selected_target);
-    formData.append("options", JSON.stringify(item.options));
-
     try {
-      const response = await fetch("/api/convert", {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await parseJsonResponse(response);
-
-      if (response.status === 403 && data.code === "PASSWORD_REQUIRED") {
-        item.status = "ready";
-        renderQueue();
-        continue;
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error || "Conversion failed");
-      }
+      const data = await window.FormatMeEngine.convertSingleFile(item.file, item.selected_target, item.options);
 
       item.status = "done";
       item.output_download_url = data.download_url;
       item.output_filename = data.output_filename;
+      item.blob = data.blob;
       convertedCount++;
-      outputUrls.push(data.download_url);
+      outputItems.push({
+        output_filename: data.output_filename,
+        download_url: data.download_url,
+        blob: data.blob
+      });
 
       addResultItem({
         filename: item.filename,
@@ -879,8 +824,12 @@ async function startConvertAllQueue() {
         time_taken: data.time_taken
       });
     } catch (err) {
-      item.status = "error";
-      item.error = err.message;
+      if (err && err.code === "PASSWORD_REQUIRED") {
+        item.status = "ready";
+      } else {
+        item.status = "error";
+        item.error = err.message;
+      }
     }
 
     renderQueue();
@@ -899,18 +848,13 @@ async function startConvertAllQueue() {
     showNotification("Batch Conversion Complete", `Successfully converted ${convertedCount} file(s)!`, "success");
   }
 
-  if (outputUrls.length > 1 && downloadAllZipBtn) {
+  if (outputItems.length > 1 && downloadAllZipBtn) {
     try {
-      const zipRes = await fetch("/api/bundle-zip", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ download_urls: outputUrls })
-      });
-      const zipData = await zipRes.json();
-      if (zipRes.ok && zipData.zip_url) {
+      const zipRes = await window.FormatMeEngine.bundleZip(outputItems, "batch_converted_files.zip");
+      if (zipRes && zipRes.zip_url) {
         downloadAllZipBtn.onclick = () => {
           const a = document.createElement("a");
-          a.href = zipData.zip_url;
+          a.href = zipRes.zip_url;
           a.download = "batch_converted_files.zip";
           a.click();
         };
