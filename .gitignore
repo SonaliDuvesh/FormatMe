@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+uploads/*
+!uploads/.gitkeep
+outputs/*
+!outputs/.gitkeep
+tests/output_artifacts/
+.DS_Store
+*.log

@@ -1,0 +1,195 @@
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1326;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d3449;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #464555;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+/* On Desktop (>= 1024px): Lock outer window scroll for fixed SaaS dashboard feel */
+@media (min-width: 1024px) {
+  html, body {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden !important;
+    overscroll-behavior: none;
+  }
+}
+
+/* On Tablets and Mobile Devices (< 1024px): Allow fluid natural touch scrolling */
+@media (max-width: 1023px) {
+  html, body {
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #4f46e5 #0b1326;
+  overscroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: #0b1326;
+  border-radius: 6px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 6px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5;
+}
+
+#results-list {
+  max-height: 300px;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #0b1326;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 1024px) {
+  #results-list {
+    max-height: none;
+  }
+}
+
+#results-list::-webkit-scrollbar {
+  width: 8px !important;
+  display: block !important;
+}
+
+#results-list::-webkit-scrollbar-track {
+  background: #0b1326 !important;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+#results-list::-webkit-scrollbar-thumb {
+  background: #10b981 !important;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#results-list::-webkit-scrollbar-thumb:hover {
+  background: #34d399 !important;
+}
+
+.result-card {
+  flex-shrink: 0 !important;
+  min-height: 68px;
+}
+
+#queue-list {
+  max-height: 380px;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: #06b6d4 #0b1326;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 1024px) {
+  #queue-list {
+    max-height: none;
+  }
+}
+
+#queue-list::-webkit-scrollbar {
+  width: 8px !important;
+  display: block !important;
+}
+
+#queue-list::-webkit-scrollbar-track {
+  background: #0b1326 !important;
+  border-radius: 8px;
+  border: 1px solid rgba(6, 182, 212, 0.25);
+}
+
+#queue-list::-webkit-scrollbar-thumb {
+  background: #06b6d4 !important;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#queue-list::-webkit-scrollbar-thumb:hover {
+  background: #22d3ee !important;
+}
+
+#dropzone.drag-active {
+  border-color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.08);
+  transform: scale(1.005);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #222a3d;
+  border-radius: 9999px;
+  height: 6px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #06b6d4;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+  transition: transform 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.target-format-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.target-format-btn.active {
+  background-color: #4f46e5 !important;
+  color: #ffffff !important;
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 14px rgba(79, 70, 229, 0.4);
+}
+
+.queue-card {
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.queue-card:hover {
+  border-color: #3b82f6;
+}
+.queue-card.selected {
+  border-color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.05);
+}
