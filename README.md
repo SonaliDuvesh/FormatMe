@@ -12,7 +12,7 @@
 <br/>
 
 <p align="center">
-  <img src="2.jpeg" alt="FormatMe Universal Converter Interface" style="max-width: 100%; border-radius: 12px;"/>
+  <img src="view.jpeg" alt="FormatMe Universal Converter Interface" style="max-width: 100%; border-radius: 12px;"/>
 </p>
 
 ---
