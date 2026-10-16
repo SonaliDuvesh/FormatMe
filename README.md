@@ -1,4 +1,4 @@
-# FormatMe - Intelligent conversion for every digital format.
+# FormatMe - Universal File Format Converter
 
 > **An enterprise-grade, privacy-first universal file format converter powered by Flask, FFmpeg, PyMuPDF, and LibreOffice.**
 
@@ -8,6 +8,12 @@
 [![LibreOffice](https://img.shields.io/badge/Document_Engine-LibreOffice_Headless-18A303?style=flat&logo=libreoffice&logoColor=white)](https://www.libreoffice.org/)
 [![Architecture](https://img.shields.io/badge/Security-Magic_Byte_Inspection-4F46E5?style=flat)](#architecture--security-safeguards)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](LICENSE)
+
+<br/>
+
+<p align="center">
+  <img src="2.jpeg" alt="FormatMe Universal Converter Interface" style="max-width: 100%; border-radius: 12px;"/>
+</p>
 
 ---
 
